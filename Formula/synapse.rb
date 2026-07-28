@@ -1,13 +1,13 @@
 class Synapse < Formula
   desc "Reverse proxy that compiles token-budgeted, task-aware context for LLM APIs"
   homepage "https://github.com/ranscky/synapse"
-  version "0.1.0"
+  version "0.1.1"
   license :cannot_represent # BSL 1.1 isn't representable in Homebrew's SPDX-based license DSL
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.0/synapse-darwin-arm64.tar.gz"
-      sha256 "8fc077e3d7d50769b4e2c4f93c75f61b99a473062dc4e6ef2ca45cd5c19e4c96"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.1/synapse-darwin-arm64.tar.gz"
+      sha256 "518885ee463d00d247e5caaacdd3a032cbcb1ffc234dcd655d1b49fdf793fa58"
     else
       odie "Synapse does not yet publish an Intel macOS build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -15,8 +15,8 @@ class Synapse < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.0/synapse-linux-amd64.tar.gz"
-      sha256 "2b7c75dc58121d01ac88356a84799a08fd9a7d00bc9ef78783f128bcf2f3449b"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.1/synapse-linux-amd64.tar.gz"
+      sha256 "f1ce1bddc4fd42fb778c33351ffe592a1fe867e2f490be5912058f6f3a546e77"
     else
       odie "Synapse does not yet publish an ARM Linux build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -25,9 +25,6 @@ class Synapse < Formula
   def install
     bin.install "synapse"
 
-    # The release archive ships the ONNX Runtime shared library flat,
-    # alongside the binary -- install it under Homebrew's own lib/ so it's
-    # on the standard runtime library search path.
     if OS.mac?
       lib.install "libonnxruntime.dylib"
     else
@@ -44,10 +41,6 @@ class Synapse < Formula
     config_path = etc/"synapse/synapse.yaml"
     return if config_path.exist?
 
-    # Scaffold the default config via `synapse init`, then repoint
-    # model-path at Homebrew's own install location -- the binary's
-    # generic "OS-standard data dir" fallback doesn't know about
-    # Homebrew's prefix, so this has to be explicit.
     system bin/"synapse", "init"
     model_path = share/"synapse/models/all-MiniLM-L6-v2/model.onnx"
     inreplace config_path, /^model-path:.*/, "model-path: \"#{model_path}\""
@@ -58,7 +51,7 @@ class Synapse < Formula
     keep_alive true
     log_path var/"log/synapse.log"
     error_log_path var/"log/synapse.log"
-    environment_variables SYNAPSE_ORT_LIB_PATH: opt_lib/(OS.mac? ? "libonnxruntime.dylib" : "libonnxruntime.so")
+    environment_variables SYNAPSE_ORT_LIB_PATH: (opt_prefix/"lib"/(OS.mac? ? "libonnxruntime.dylib" : "libonnxruntime.so")).to_s
   end
 
   def caveats
@@ -72,7 +65,7 @@ class Synapse < Formula
         brew services start synapse
 
       To run in the foreground instead, export the ONNX Runtime path first:
-        export SYNAPSE_ORT_LIB_PATH=#{opt_lib}/#{OS.mac? ? "libonnxruntime.dylib" : "libonnxruntime.so"}
+        export SYNAPSE_ORT_LIB_PATH=#{opt_prefix}/lib/#{OS.mac? ? "libonnxruntime.dylib" : "libonnxruntime.so"}
         synapse --config #{etc}/synapse/synapse.yaml
 
       Uninstalling does not remove your config or memory database. To fully
