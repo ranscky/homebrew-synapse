@@ -1,13 +1,13 @@
 class Synapse < Formula
   desc "Reverse proxy that compiles token-budgeted, task-aware context for LLM APIs"
   homepage "https://github.com/ranscky/synapse"
-  version "0.1.3"
+  version "0.1.4"
   license :cannot_represent # BSL 1.1 isn't representable in Homebrew's SPDX-based license DSL
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.3/synapse-darwin-arm64.tar.gz"
-      sha256 "65ac1b3736c4972aa24a3de27df951d19a96fe9735911021a0487caac04fd7ac"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.4/synapse-darwin-arm64.tar.gz"
+      sha256 "1b208017e1e56b4189d9398b7015ef1e3c332a43ca9db2d5e88b1d8e4d0dafd2"
     else
       odie "Synapse does not yet publish an Intel macOS build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -15,8 +15,8 @@ class Synapse < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.3/synapse-linux-amd64.tar.gz"
-      sha256 "0be1e331db5e4f60b32726cd512ee5dbc7b89bcfe43654ea245a3867a0240466"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.4/synapse-linux-amd64.tar.gz"
+      sha256 "09eef15dc4f26c193043f50e7fe06995d7387e031211818d62563797188d91ae"
     else
       odie "Synapse does not yet publish an ARM Linux build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -42,10 +42,6 @@ class Synapse < Formula
     return if config_path.exist?
 
     system bin/"synapse", "init", "--config", config_path.to_s
-    # opt_share resolves through Homebrew's version-independent opt/
-    # symlink, so the config keeps working across `brew upgrade` instead
-    # of pointing at a specific Cellar/synapse/<version> path that stops
-    # existing once that version is removed.
     model_path = opt_share/"synapse/models/all-MiniLM-L6-v2/model.onnx"
     inreplace config_path, /^model-path:.*/, "model-path: \"#{model_path}\""
   end
