@@ -1,13 +1,13 @@
 class Synapse < Formula
   desc "Reverse proxy that compiles token-budgeted, task-aware context for LLM APIs"
   homepage "https://github.com/ranscky/synapse"
-  version "0.1.2"
+  version "0.1.3"
   license :cannot_represent # BSL 1.1 isn't representable in Homebrew's SPDX-based license DSL
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.2/synapse-darwin-arm64.tar.gz"
-      sha256 "2b0d09e528f27f2e8548fa3bdb8fdf526d16c090eef119094e25a0fbd6f9611f"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.3/synapse-darwin-arm64.tar.gz"
+      sha256 "65ac1b3736c4972aa24a3de27df951d19a96fe9735911021a0487caac04fd7ac"
     else
       odie "Synapse does not yet publish an Intel macOS build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -15,8 +15,8 @@ class Synapse < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.2/synapse-linux-amd64.tar.gz"
-      sha256 "7a25e253427e86f8a2b357e88d16c326edcbc6f0c44f7d3e3bc2454b4be74e0c"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.3/synapse-linux-amd64.tar.gz"
+      sha256 "0be1e331db5e4f60b32726cd512ee5dbc7b89bcfe43654ea245a3867a0240466"
     else
       odie "Synapse does not yet publish an ARM Linux build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -42,7 +42,11 @@ class Synapse < Formula
     return if config_path.exist?
 
     system bin/"synapse", "init", "--config", config_path.to_s
-    model_path = share/"synapse/models/all-MiniLM-L6-v2/model.onnx"
+    # opt_share resolves through Homebrew's version-independent opt/
+    # symlink, so the config keeps working across `brew upgrade` instead
+    # of pointing at a specific Cellar/synapse/<version> path that stops
+    # existing once that version is removed.
+    model_path = opt_share/"synapse/models/all-MiniLM-L6-v2/model.onnx"
     inreplace config_path, /^model-path:.*/, "model-path: \"#{model_path}\""
   end
 
