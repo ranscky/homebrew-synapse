@@ -41,7 +41,7 @@ class Synapse < Formula
     config_path = etc/"synapse/synapse.yaml"
     return if config_path.exist?
 
-    system bin/"synapse", "init", "--config", config_path.to_s
+    system bin/"synapse", "init", "--config", config_path.to_s, "--yes"
     model_path = opt_share/"synapse/models/all-MiniLM-L6-v2/model.onnx"
     inreplace config_path, /^model-path:.*/, "model-path: \"#{model_path}\""
   end
