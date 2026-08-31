@@ -1,13 +1,13 @@
 class Synapse < Formula
   desc "Reverse proxy that compiles token-budgeted, task-aware context for LLM APIs"
   homepage "https://github.com/ranscky/synapse"
-  version "0.1.12"
+  version "0.1.13"
   license :cannot_represent # BSL 1.1 isn't representable in Homebrew's SPDX-based license DSL
 
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.12/synapse-darwin-arm64.tar.gz"
-      sha256 "59d1480dbb4c3d8e29a1e44698ccb21aee3f4667354172fae5d592f782814ead"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.13/synapse-darwin-arm64.tar.gz"
+      sha256 "4cd5e88747be9f905a2b8ec2753845a72be6610ee8e84715718acc39106f98cf"
     else
       odie "Synapse does not yet publish an Intel macOS build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
@@ -15,8 +15,8 @@ class Synapse < Formula
 
   on_linux do
     if Hardware::CPU.intel?
-      url "https://github.com/ranscky/synapse/releases/download/v0.1.12/synapse-linux-amd64.tar.gz"
-      sha256 "30dd6f1e55cab0d65187bc3bb65dc90618b9ca26359e7877755cfd3467a97ed1"
+      url "https://github.com/ranscky/synapse/releases/download/v0.1.13/synapse-linux-amd64.tar.gz"
+      sha256 "530bc657f3ed196c6aacf39a2e0d4ec8f166a26eee2b9852647bd0a1739cba81"
     else
       odie "Synapse does not yet publish an ARM Linux build. Build from source instead: https://github.com/ranscky/synapse#option-3--manual-build"
     end
